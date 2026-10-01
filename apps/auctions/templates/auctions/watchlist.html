@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Watchlist{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>Watchlist</h1></div>
+{% if auctions %}
+  <div class="grid">
+    {% for auction in auctions %}{% include "auctions/_card.html" %}{% endfor %}
+  </div>
+{% else %}
+  <p class="empty">You are not watching any auctions.</p>
+{% endif %}
+{% endblock %}

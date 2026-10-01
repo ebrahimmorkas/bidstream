@@ -1,0 +1,18 @@
+<div id="results">
+  {% if auctions %}
+    <div class="grid">
+      {% for auction in auctions %}
+        {% include "auctions/_card.html" %}
+      {% endfor %}
+    </div>
+    {% if is_paginated %}
+      <nav class="pagination">
+        {% if page_obj.has_previous %}<a href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">&larr; Previous</a>{% endif %}
+        <span class="muted">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Next &rarr;</a>{% endif %}
+      </nav>
+    {% endif %}
+  {% else %}
+    <p class="empty">No auctions match your filters.</p>
+  {% endif %}
+</div>

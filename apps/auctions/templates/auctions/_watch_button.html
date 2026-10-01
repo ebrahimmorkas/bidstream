@@ -1,0 +1,7 @@
+<form method="post" action="{% url 'auctions:watch' auction.pk %}"
+      hx-post="{% url 'auctions:watch' auction.pk %}" hx-swap="outerHTML" class="inline">
+  {% csrf_token %}
+  <button class="btn btn--ghost btn--small" type="submit">
+    {% if is_watching %}&#9733; Watching{% else %}&#9734; Watch{% endif %}
+  </button>
+</form>

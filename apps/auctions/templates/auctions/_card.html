@@ -1,0 +1,16 @@
+{% load humanize %}
+<a class="card auction-card" href="{{ auction.get_absolute_url }}">
+  <div class="auction-card__image"{% if auction.image %} style="background-image:url('{{ auction.image.url }}')"{% endif %}></div>
+  <div class="auction-card__body">
+    <span class="auction-card__title">{{ auction.title }}</span>
+    <span class="price">${{ auction.display_price|intcomma }}</span>
+    <span class="muted">
+      {% with phase=auction.phase %}
+        {% if phase == "live" %}{{ auction.bid_count }} bid{{ auction.bid_count|pluralize }} &middot; ends in {{ auction.ends_at|timeuntil }}
+        {% elif phase == "upcoming" %}starts in {{ auction.starts_at|timeuntil }}
+        {% else %}<span class="badge badge--{{ phase }}">{{ phase|capfirst }}</span>
+        {% endif %}
+      {% endwith %}
+    </span>
+  </div>
+</a>
