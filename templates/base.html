@@ -1,0 +1,46 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}BidStream{% endblock %} · BidStream</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="{% url 'home' %}">Bid<span>Stream</span></a>
+      <nav class="nav">
+        {% block nav %}{% endblock %}
+        {% if user.is_authenticated %}
+          {% block nav_user %}{% endblock %}
+          <form method="post" action="{% url 'logout' %}" class="inline">
+            {% csrf_token %}
+            <button class="link" type="submit">Log out</button>
+          </form>
+        {% else %}
+          {% block nav_anon %}{% endblock %}
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="message message--{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer container">
+    <p>BidStream &middot; real-time auctions built with Django &amp; Channels</p>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
