@@ -1,0 +1,8 @@
+Hi {{ user.display_name }},
+
+Someone just outbid you on "{{ auction.title }}".
+The current price is ${{ auction.current_price }}. The next bid must be at least ${{ auction.minimum_next_bid }}.
+
+Bid again: {{ url }}
+
+BidStream

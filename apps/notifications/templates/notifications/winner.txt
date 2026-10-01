@@ -1,0 +1,8 @@
+Congratulations {{ auction.winner.display_name }}!
+
+You won "{{ auction.title }}" for ${{ auction.current_price }}.
+The seller, {{ auction.seller.display_name }}, will contact you at this email address to arrange payment and delivery.
+
+Auction: {{ url }}
+
+BidStream

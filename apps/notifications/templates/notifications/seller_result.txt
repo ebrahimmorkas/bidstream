@@ -1,0 +1,14 @@
+Hi {{ auction.seller.display_name }},
+
+Your auction "{{ auction.title }}" has ended.
+{% if auction.winner %}
+Sold for ${{ auction.current_price }} after {{ auction.bid_count }} bid{{ auction.bid_count|pluralize }}.
+Winner: {{ auction.winner.display_name }} <{{ auction.winner.email }}>
+{% elif auction.bid_count %}
+The reserve price of ${{ auction.reserve_price }} was not met (highest bid: ${{ auction.current_price }}), so the item was not sold.
+{% else %}
+There were no bids this time. You can list the item again whenever you like.
+{% endif %}
+Auction: {{ url }}
+
+BidStream
