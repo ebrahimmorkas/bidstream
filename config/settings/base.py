@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "apps.auctions",
     "apps.bidding",
     "apps.realtime",
+    "apps.notifications",
 ]
 
 MIDDLEWARE = [
@@ -107,6 +108,25 @@ if REDIS_URL:
 else:
     CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
+# --- Celery ---------------------------------------------------------------------
+# With a broker, tasks run in worker processes and beat closes auctions on schedule.
+# Without one, tasks run eagerly in-process and expired auctions are closed lazily
+# when viewed (or via ``manage.py close_auctions`` from cron).
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default=REDIS_URL)
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=REDIS_URL or None)
+CELERY_TASK_ALWAYS_EAGER = env.bool("CELERY_TASK_ALWAYS_EAGER", default=not CELERY_BROKER_URL)
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TASK_ACKS_LATE = True
+CELERY_TIMEZONE = "UTC"
+CELERY_BEAT_SCHEDULE = {
+    "close-expired-auctions": {
+        "task": "apps.auctions.tasks.close_expired_auctions",
+        "schedule": env.int("BIDSTREAM_CLOSE_INTERVAL_SECONDS", default=15),
+    },
+}
+if not CELERY_BROKER_URL:
+    CELERY_BROKER_URL = "memory://"
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -134,6 +154,8 @@ BIDSTREAM_MIN_AUCTION_MINUTES = env.int("BIDSTREAM_MIN_AUCTION_MINUTES", default
 BIDSTREAM_MAX_AUCTION_DAYS = env.int("BIDSTREAM_MAX_AUCTION_DAYS", default=30)
 BIDSTREAM_ANTI_SNIPE_MINUTES = env.int("BIDSTREAM_ANTI_SNIPE_MINUTES", default=2)
 BIDSTREAM_MAX_BID = Decimal(env("BIDSTREAM_MAX_BID", default="1000000"))
+
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="BidStream <no-reply@bidstream.local>")
