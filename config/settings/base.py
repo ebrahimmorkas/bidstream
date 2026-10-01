@@ -31,6 +31,10 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     # third party
     "channels",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "django_filters",
+    "drf_spectacular",
     # local
     "apps.core",
     "apps.accounts",
@@ -38,6 +42,7 @@ INSTALLED_APPS = [
     "apps.bidding",
     "apps.realtime",
     "apps.notifications",
+    "apps.api",
 ]
 
 MIDDLEWARE = [
@@ -154,6 +159,30 @@ BIDSTREAM_MIN_AUCTION_MINUTES = env.int("BIDSTREAM_MIN_AUCTION_MINUTES", default
 BIDSTREAM_MAX_AUCTION_DAYS = env.int("BIDSTREAM_MAX_AUCTION_DAYS", default=30)
 BIDSTREAM_ANTI_SNIPE_MINUTES = env.int("BIDSTREAM_ANTI_SNIPE_MINUTES", default=2)
 BIDSTREAM_MAX_BID = Decimal(env("BIDSTREAM_MAX_BID", default="1000000"))
+
+# --- REST API -------------------------------------------------------------------
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticatedOrReadOnly"],
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {"bids": env("THROTTLE_BIDS", default="30/min")},
+}
+SPECTACULAR_SETTINGS = {
+    "TITLE": "BidStream API",
+    "DESCRIPTION": "Browse auctions and place bids. Live updates are available over WebSockets.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 SITE_URL = env("SITE_URL", default="http://localhost:8000")
 
