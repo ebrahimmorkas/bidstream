@@ -6,6 +6,7 @@ without ``REDIS_URL`` the cache, channel layer and Celery fall back to in-proces
 implementations.
 """
 
+from decimal import Decimal
 from pathlib import Path
 
 import environ
@@ -34,6 +35,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.auctions",
+    "apps.bidding",
 ]
 
 MIDDLEWARE = [
@@ -116,6 +118,8 @@ STORAGES = {
 # --- Auction rules ---------------------------------------------------------------
 BIDSTREAM_MIN_AUCTION_MINUTES = env.int("BIDSTREAM_MIN_AUCTION_MINUTES", default=5)
 BIDSTREAM_MAX_AUCTION_DAYS = env.int("BIDSTREAM_MAX_AUCTION_DAYS", default=30)
+BIDSTREAM_ANTI_SNIPE_MINUTES = env.int("BIDSTREAM_ANTI_SNIPE_MINUTES", default=2)
+BIDSTREAM_MAX_BID = Decimal(env("BIDSTREAM_MAX_BID", default="1000000"))
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="BidStream <no-reply@bidstream.local>")

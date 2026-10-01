@@ -67,6 +67,14 @@ class Auction(TimeStampedModel):
     )
     current_price = models.DecimalField(**MONEY, null=True, blank=True, editable=False)
     bid_count = models.PositiveIntegerField(default=0, editable=False)
+    leading_bidder = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="leading_auctions",
+    )
 
     starts_at = models.DateTimeField(default=timezone.now)
     ends_at = models.DateTimeField()
@@ -140,6 +148,9 @@ class Auction(TimeStampedModel):
         if self.reserve_price is None:
             return True
         return self.current_price is not None and self.current_price >= self.reserve_price
+
+    def recent_bids(self, limit: int = 10):
+        return self.bids.select_related("bidder")[:limit]
 
     @property
     def is_editable(self) -> bool:
