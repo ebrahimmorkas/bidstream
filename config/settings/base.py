@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "channels",
     # local
     "apps.core",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
@@ -46,6 +47,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+AUTH_USER_MODEL = "accounts.User"
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "home"
 
 TEMPLATES = [
     {

@@ -16,12 +16,14 @@
         {% block nav %}{% endblock %}
         {% if user.is_authenticated %}
           {% block nav_user %}{% endblock %}
+          <span class="muted">{{ user.display_name }}</span>
           <form method="post" action="{% url 'logout' %}" class="inline">
             {% csrf_token %}
             <button class="link" type="submit">Log out</button>
           </form>
         {% else %}
-          {% block nav_anon %}{% endblock %}
+          <a href="{% url 'login' %}">Log in</a>
+          <a class="btn btn--small" href="{% url 'signup' %}">Sign up</a>
         {% endif %}
       </nav>
     </div>
