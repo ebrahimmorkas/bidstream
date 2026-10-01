@@ -9,6 +9,7 @@ from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import AuctionFilterForm, AuctionForm
 from .models import Auction, Watch
+from .services import close_auction
 
 SORT_ORDER = {
     "ending": ["ends_at"],
@@ -70,6 +71,14 @@ class AuctionDetailView(DetailView):
 
     def get_queryset(self):
         return Auction.objects.select_related("seller", "category", "winner", "leading_bidder")
+
+    def get_object(self, queryset=None):
+        auction = super().get_object(queryset)
+        if auction.phase == "ending":
+            # Lazy close: don't show a stale "open" auction if the beat job hasn't run yet.
+            close_auction(auction.pk)
+            auction = super().get_object(queryset)
+        return auction
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
