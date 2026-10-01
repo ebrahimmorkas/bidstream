@@ -15,6 +15,7 @@
       <nav class="nav">
         <a href="{% url 'auctions:list' %}">Browse</a>
         {% if user.is_authenticated %}
+          <a href="{% url 'bidding:mine' %}">My bids</a>
           <a href="{% url 'auctions:watchlist' %}">Watchlist</a>
           <a href="{% url 'auctions:mine' %}">My listings</a>
           <span class="muted">{{ user.display_name }}</span>

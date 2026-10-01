@@ -1,10 +1,9 @@
 {% extends "base.html" %}
-{% load humanize %}
 
 {% block title %}{{ auction.title }}{% endblock %}
 
 {% block content %}
-<div class="detail">
+<div class="detail" id="auction" data-auction-id="{{ auction.pk }}" data-user-id="{{ user.pk|default:'' }}">
   <div>
     <div class="detail__image"{% if auction.image %} style="background-image:url('{{ auction.image.url }}')"{% endif %}></div>
     <h1>{{ auction.title }}</h1>
@@ -15,36 +14,19 @@
     <p>{{ auction.description|linebreaksbr }}</p>
   </div>
 
-  <aside class="card" id="auction-panel">
-    {% with phase=auction.phase %}
-    <p><span class="badge badge--{{ phase }}">{{ phase|capfirst }}</span></p>
-
-    <p class="muted">{% if auction.bid_count %}Current bid{% else %}Starting price{% endif %}</p>
-    <p class="price price--large">$<span id="current-price">{{ auction.display_price|intcomma }}</span></p>
-    <p class="muted"><span id="bid-count">{{ auction.bid_count }}</span> bid(s)
-      {% if auction.reserve_price %}&middot; reserve {% if auction.reserve_met %}met{% else %}not met{% endif %}{% endif %}
-    </p>
-
-    {% if phase == "live" %}
-      <p>Ends <strong id="ends-at" data-ends-at="{{ auction.ends_at.isoformat }}">{{ auction.ends_at|date:"M j, H:i" }} UTC</strong>
-        (<span id="countdown">{{ auction.ends_at|timeuntil }}</span>)</p>
-    {% elif phase == "upcoming" %}
-      <p>Starts {{ auction.starts_at|date:"M j, H:i" }} UTC</p>
-    {% elif phase == "closed" %}
-      <p>{% if auction.winner %}Won by <strong>{{ auction.winner.masked_name }}</strong> for ${{ auction.current_price|intcomma }}{% else %}Ended without a sale.{% endif %}</p>
-    {% endif %}
-    {% endwith %}
+  <aside>
+    {% include "bidding/_bid_panel.html" %}
 
     {% if user.is_authenticated %}
-      <p>{% include "auctions/_watch_button.html" %}</p>
-      {% if user == auction.seller and auction.is_editable %}
-        <p>
+      <div class="card" style="margin-top:16px">
+        {% include "auctions/_watch_button.html" %}
+        {% if user == auction.seller and auction.is_editable %}
           <a class="btn btn--small" href="{% url 'auctions:edit' auction.pk %}">Edit</a>
           <form method="post" action="{% url 'auctions:cancel' auction.pk %}" class="inline">
             {% csrf_token %}<button class="btn btn--ghost btn--small" type="submit">Cancel auction</button>
           </form>
-        </p>
-      {% endif %}
+        {% endif %}
+      </div>
     {% endif %}
   </aside>
 </div>
