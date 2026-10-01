@@ -3,7 +3,7 @@
   <div class="auction-card__image"{% if auction.image %} style="background-image:url('{{ auction.image.url }}')"{% endif %}></div>
   <div class="auction-card__body">
     <span class="auction-card__title">{{ auction.title }}</span>
-    <span class="price">${{ auction.display_price|intcomma }}</span>
+    <span class="price" data-price-for="{{ auction.pk }}">${{ auction.display_price|intcomma }}</span>
     <span class="muted">
       {% with phase=auction.phase %}
         {% if phase == "live" %}{{ auction.bid_count }} bid{{ auction.bid_count|pluralize }} &middot; ends in {{ auction.ends_at|timeuntil }}
