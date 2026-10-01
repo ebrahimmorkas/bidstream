@@ -4,8 +4,22 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+from django.views.generic import TemplateView
+
+from apps.auctions.models import Auction
 
 logger = logging.getLogger(__name__)
+
+
+class HomeView(TemplateView):
+    template_name = "core/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        live = Auction.objects.live().select_related("category")
+        context["ending_soon"] = live.order_by("ends_at")[:8]
+        context["most_active"] = live.order_by("-bid_count", "ends_at")[:4]
+        return context
 
 
 @require_GET

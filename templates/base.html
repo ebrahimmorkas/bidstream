@@ -13,9 +13,10 @@
     <div class="container topbar__inner">
       <a class="brand" href="{% url 'home' %}">Bid<span>Stream</span></a>
       <nav class="nav">
-        {% block nav %}{% endblock %}
+        <a href="{% url 'auctions:list' %}">Browse</a>
         {% if user.is_authenticated %}
-          {% block nav_user %}{% endblock %}
+          <a href="{% url 'auctions:watchlist' %}">Watchlist</a>
+          <a href="{% url 'auctions:mine' %}">My listings</a>
           <span class="muted">{{ user.display_name }}</span>
           <form method="post" action="{% url 'logout' %}" class="inline">
             {% csrf_token %}

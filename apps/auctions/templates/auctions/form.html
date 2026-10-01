@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Edit auction{% else %}Sell an item{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>{% if object %}Edit "{{ object.title }}"{% else %}Sell an item{% endif %}</h1></div>
+<div class="card">
+  <form method="post" enctype="multipart/form-data" class="form" novalidate>
+    {% csrf_token %}
+    {{ form.as_div }}
+    <div><button class="btn" type="submit">{% if object %}Save changes{% else %}List item{% endif %}</button></div>
+  </form>
+</div>
+{% endblock %}

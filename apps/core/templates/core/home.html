@@ -6,5 +6,22 @@
 <section class="hero">
   <h1>Live auctions, <em>real-time</em> bidding.</h1>
   <p class="muted">Every bid is pushed instantly to everyone watching. No refresh needed.</p>
+  <p><a class="btn" href="{% url 'auctions:list' %}">Browse live auctions</a></p>
 </section>
+
+{% if most_active %}
+  <div class="page-header"><h2>Hot right now</h2></div>
+  <div class="grid">
+    {% for auction in most_active %}{% include "auctions/_card.html" %}{% endfor %}
+  </div>
+{% endif %}
+
+<div class="page-header"><h2>Ending soon</h2></div>
+{% if ending_soon %}
+  <div class="grid">
+    {% for auction in ending_soon %}{% include "auctions/_card.html" %}{% endfor %}
+  </div>
+{% else %}
+  <p class="empty">No live auctions right now. Check back soon!</p>
+{% endif %}
 {% endblock %}

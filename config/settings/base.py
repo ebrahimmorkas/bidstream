@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # local
     "apps.core",
     "apps.accounts",
+    "apps.auctions",
 ]
 
 MIDDLEWARE = [
@@ -111,6 +112,10 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
+
+# --- Auction rules ---------------------------------------------------------------
+BIDSTREAM_MIN_AUCTION_MINUTES = env.int("BIDSTREAM_MIN_AUCTION_MINUTES", default=5)
+BIDSTREAM_MAX_AUCTION_DAYS = env.int("BIDSTREAM_MAX_AUCTION_DAYS", default=30)
 
 EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="BidStream <no-reply@bidstream.local>")
