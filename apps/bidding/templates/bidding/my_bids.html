@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}My bids{% endblock %}
+
+{% block content %}
+<div class="page-header"><h1>My bids</h1></div>
+{% if auctions %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>Item</th><th>My highest bid</th><th>Current price</th><th>Status</th><th>Ends</th></tr></thead>
+    <tbody>
+      {% for auction in auctions %}
+        <tr>
+          <td><a href="{{ auction.get_absolute_url }}">{{ auction.title }}</a></td>
+          <td>${{ auction.my_max_bid|intcomma }}</td>
+          <td>${{ auction.display_price|intcomma }}</td>
+          <td>
+            {% if auction.status == "closed" %}
+              {% if auction.winner_id == user.pk %}<span class="badge badge--live">Won</span>{% else %}<span class="badge badge--closed">Lost</span>{% endif %}
+            {% elif auction.status == "cancelled" %}<span class="badge badge--cancelled">Cancelled</span>
+            {% elif auction.leading_bidder_id == user.pk %}<span class="badge badge--live">Leading</span>
+            {% else %}<span class="badge badge--upcoming">Outbid</span>{% endif %}
+          </td>
+          <td>{{ auction.ends_at|date:"M j, H:i" }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  <p class="empty">You haven't placed any bids yet. <a href="{% url 'auctions:list' %}">Find something you like</a>.</p>
+{% endif %}
+{% endblock %}

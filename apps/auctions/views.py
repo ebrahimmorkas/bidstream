@@ -69,7 +69,7 @@ class AuctionDetailView(DetailView):
     context_object_name = "auction"
 
     def get_queryset(self):
-        return Auction.objects.select_related("seller", "category", "winner")
+        return Auction.objects.select_related("seller", "category", "winner", "leading_bidder")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

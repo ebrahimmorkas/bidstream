@@ -1,0 +1,58 @@
+{% load humanize %}
+<div class="card" id="bid-panel">
+  {% with phase=auction.phase %}
+  <p>
+    <span class="badge badge--{{ phase }}" id="phase-badge">{{ phase|capfirst }}</span>
+    <span class="live-indicator" id="live-indicator">live updates</span>
+  </p>
+
+  <p class="muted">{% if auction.bid_count %}Current bid{% else %}Starting price{% endif %}</p>
+  <p class="price price--large">$<span id="current-price">{{ auction.display_price|intcomma }}</span></p>
+  <p class="muted">
+    <span id="bid-count">{{ auction.bid_count }}</span> bid(s)
+    {% if auction.reserve_price %}&middot; <span id="reserve-status">reserve {% if auction.reserve_met %}met{% else %}not met{% endif %}</span>{% endif %}
+  </p>
+  <p id="leader-status">
+    {% if user.is_authenticated and auction.leading_bidder_id == user.pk %}<strong>You are the highest bidder.</strong>{% endif %}
+  </p>
+
+  {% if phase == "live" %}
+    <p>Ends <strong>{{ auction.ends_at|date:"M j, H:i" }} UTC</strong> &middot;
+      <span id="countdown" data-ends-at="{{ auction.ends_at.isoformat }}">{{ auction.ends_at|timeuntil }}</span></p>
+  {% elif phase == "upcoming" %}
+    <p>Starts {{ auction.starts_at|date:"M j, H:i" }} UTC</p>
+  {% elif phase == "closed" %}
+    <p>{% if auction.winner %}Won by <strong>{{ auction.winner.masked_name }}</strong> for ${{ auction.current_price|intcomma }}{% else %}Ended without a sale.{% endif %}</p>
+  {% endif %}
+
+  {% if bid_error %}<p class="message message--error">{{ bid_error }}</p>{% endif %}
+  {% if bid_success %}<p class="message message--success">{{ bid_success }}</p>{% endif %}
+
+  {% if phase == "live" %}
+    {% if not user.is_authenticated %}
+      <p><a class="btn" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in to bid</a></p>
+    {% elif user != auction.seller %}
+      <form method="post" action="{% url 'bidding:place' auction.pk %}" class="form"
+            hx-post="{% url 'bidding:place' auction.pk %}" hx-target="#bid-panel" hx-swap="outerHTML">
+        {% csrf_token %}
+        <div>
+          <label for="bid-amount">Your bid (min ${{ auction.minimum_next_bid|intcomma }})</label>
+          <input id="bid-amount" name="amount" type="number" step="0.01"
+                 min="{{ auction.minimum_next_bid|stringformat:'s' }}"
+                 value="{{ auction.minimum_next_bid|stringformat:'s' }}" required>
+        </div>
+        <div><button class="btn" type="submit">Place bid</button></div>
+      </form>
+    {% endif %}
+  {% endif %}
+  {% endwith %}
+
+  <h3>Bid history</h3>
+  <ul class="bid-history" id="bid-history">
+    {% for bid in auction.recent_bids %}
+      <li><span>{{ bid.bidder.masked_name }}</span><span>${{ bid.amount|intcomma }}</span></li>
+    {% empty %}
+      <li class="muted" id="no-bids">No bids yet. Be the first!</li>
+    {% endfor %}
+  </ul>
+</div>
