@@ -59,3 +59,7 @@ def broadcast_auction_closed(auction) -> None:
         "final_price": _money(auction.current_price) if auction.current_price else None,
     }
     send_to_groups(payload, auction_group(auction.pk), FEED_GROUP)
+
+
+def on_auction_closed(sender, auction, **kwargs) -> None:
+    broadcast_auction_closed(auction)
