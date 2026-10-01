@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.auctions",
     "apps.bidding",
+    "apps.realtime",
 ]
 
 MIDDLEWARE = [
@@ -92,6 +93,19 @@ if REDIS_URL:
     }
 else:
     CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
+# --- Channels -------------------------------------------------------------------
+# Redis lets every server process share WebSocket groups; the in-memory layer is
+# fine for a single dev process (``manage.py runserver`` via Daphne).
+if REDIS_URL:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [REDIS_URL]},
+        }
+    }
+else:
+    CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
